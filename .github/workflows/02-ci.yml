@@ -1,32 +1,31 @@
-name: 02 CI Workflow
+name: CI with Matrix from Secret
 
 on:
-  schedule:
-    - cron: "18 10 * * *"
   workflow_dispatch:
 
 jobs:
+  set-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      python_versions: ${{ steps.export.outputs.python_versions }}
+
+    steps:
+      - name: Export secret to output
+        id: export
+        run: |
+          echo "python_versions=${{ secrets.python }}" >> $GITHUB_OUTPUT
+
   ci:
+    needs: set-matrix
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: [3.11, 3.12]
+        python-version: ${{ fromJson(needs.set-matrix.outputs.python_versions) }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: List files
-        run: |
-          echo "📂 Files in repo:"
-          ls -R
-
-      - name: Show time (UTC)
-        run: date
-
-      - name: Show Egypt time
-        run: TZ="Africa/Cairo" date
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -35,12 +34,3 @@ jobs:
 
       - name: Check Python version
         run: python --version
-
-      - name: Install dependencies (optional)
-        run: |
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-
-      - name: Run tests
-        run: python -m unittest discover -s tests -v
