@@ -11,11 +11,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  say-hello:
-    # GitHub provides a fresh runner for the job.
+  on-merge:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-
     steps:
-      - name: Say hello
-        # This single step is enough to show a full workflow run.
-        run: echo "Hello from GitHub Actions"
+      - name: Run on merge
+        run: echo "The PR was successfully merged!"
