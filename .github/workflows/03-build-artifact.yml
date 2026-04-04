@@ -41,7 +41,7 @@ jobs:
           context: .
           push: false
           tags: ${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.image_tag }}
-          load: true   # 👈 مهم علشان نستخدمها بعد كده في docker save
+          load: flase   # 👈 مهم علشان نستخدمها بعد كده في docker save
 
       - name: Save Docker image as artifact file
         run: docker save "${IMAGE_NAME}:${{ steps.image-tag.outputs.image_tag }}" -o "${IMAGE_TAR}"
